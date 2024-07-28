@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isabella's Drawing Pad</title>
+    <style>
+        body {
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+            color: #fff;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-top: 20px;
+        }
+        canvas {
+            border: 3px solid #fff;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .toolbar {
+            margin: 20px 0;
+        }
+        .toolbar button, .toolbar select {
+            font-size: 1em;
+            padding: 10px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .toolbar button:hover, .toolbar select:hover {
+            opacity: 0.8;
+        }
+        #colorPicker {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Isabella's Drawing Pad</h1>
+    <div class="toolbar">
+        <button onclick="changeTool('pencil')" style="background-color: lightgrey;">Pencil</button>
+        <button onclick="changeTool('pen')" style="background-color: darkgrey;">Pen</button>
+        <button onclick="changeTool('brush')" style="background-color: black;">Brush</button>
+        <button onclick="changeTool('eraser')" style="background-color: white; color: black;">Eraser</button>
+        <button onclick="clearCanvas()">Clear</button>
+        <select id="thicknessPicker" onchange="changeThickness(this.value)">
+            <option value="2">Thin</option>
+            <option value="5">Medium</option>
+            <option value="10">Thick</option>
+        </select>
+        <input type="color" id="colorPicker" onchange="pickColor(this.value)">
+    </div>
+    <canvas id="drawingCanvas" width="600" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('drawingCanvas');
+        const context = canvas.getContext('2d');
+        let drawing = false;
+        let currentColor = 'black';
+        let currentTool = 'pencil';
+        let currentThickness = 2;
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        function startDrawing(e) {
+            drawing = true;
+            draw(e);
+        }
+
+        function draw(e) {
+            if (!drawing) return;
+            context.lineWidth = currentThickness;
+            context.lineCap = 'round';
+
+            if (currentTool === 'eraser') {
+                context.strokeStyle = 'white';
+            } else {
+                context.strokeStyle = currentColor;
+            }
+
+            context.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+            context.stroke();
+            context.beginPath();
+            context.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+        }
+
+        function stopDrawing() {
+            drawing = false;
+            context.beginPath();
+        }
+
+        function changeTool(tool) {
+            currentTool = tool;
+            if (tool === 'pencil') {
+                currentThickness = 2;
+            } else if (tool === 'pen') {
+                currentThickness = 5;
+            } else if (tool === 'brush') {
+                currentThickness = 10;
+            } else if (tool === 'eraser') {
+                currentThickness = 10;
+            }
+            document.getElementById('thicknessPicker').value = currentThickness;
+        }
+
+        function changeThickness(thickness) {
+            currentThickness = thickness;
+        }
+
+        function changeColor(color) {
+            currentColor = color;
+        }
+
+        function pickColor(color) {
+            currentColor = color;
+        }
+
+        function clearCanvas() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    </script>
+</body>
+</html>
